@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>برنامج التطوير المهني · مشاهدة تفاعلية — مدارس الرواد العالمية</title>
+
+<!-- Arabic Google Font: Tajawal (300/400/500/700) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  /* ============================================================
+     AIS brand palette — reused from the AIS Pathway Hub design
+     (index-23.html): navy #0c2d54, gold #EDBA1D, cream #fefcf4,
+     light gold #fdf3d4, hairline border #e0d8c8.
+     Brand constants: Navy #1D5394 / #0C2E54, Gold #FAD966 / #C8A84E.
+     ============================================================ */
+  :root{
+    --navy:        #0c2d54;
+    --navy-brand:  #1D5394;
+    --navy-deep:   #08203d;
+    --gold:        #EDBA1D;
+    --gold-soft:   #FAD966;
+    --gold-deep:   #C8A84E;
+    --cream:       #fefcf4;
+    --gold-tint:   #fdf3d4;
+    --line:        #e0d8c8;
+    --ink:         #333;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: 'Tajawal', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Header (mimics the reference navy nav bar) ---------- */
+  .topbar {
+    background: var(--navy);
+    border-bottom: 3px solid var(--gold);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .topbar-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .topbar img.emblem { width: 42px; height: 42px; display: block; }
+  .school-name { line-height: 1.35; }
+  .school-name strong {
+    display: block;
+    color: var(--gold);
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .school-name span {
+    display: block;
+    color: rgba(255,255,255,0.75);
+    font-size: 11.5px;
+    font-weight: 300;
+    letter-spacing: 0.2px;
+  }
+  .section-tag {
+    margin-inline-start: auto;
+    background: rgba(237,186,29,0.14);
+    border: 1px solid rgba(237,186,29,0.45);
+    color: var(--gold-soft);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* ---------- Page title strip ---------- */
+  .page-title {
+    background: linear-gradient(180deg, var(--navy-deep), var(--navy));
+    color: #fff;
+    padding: 26px 16px 30px;
+    text-align: center;
+  }
+  .page-title h1 {
+    margin: 0 0 8px;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gold-soft);
+  }
+  .page-title .lecture {
+    margin: 0;
+    font-size: 15.5px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.92);
+  }
+  .page-title .lecture b { font-weight: 700; color: #fff; }
+
+  /* ---------- Layout ---------- */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 22px 16px 48px;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--gold);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 10px rgba(12,45,84,0.05);
+  }
+  .hidden { display: none !important; }
+
+  /* ---------- Identity gate ---------- */
+  #gateCard { max-width: 480px; margin: 12px auto 0; }
+  #gateCard h2 {
+    margin: 0 0 6px;
+    color: var(--navy);
+    font-size: 18px;
+    font-weight: 700;
+  }
+  #gateCard p.hint { margin: 0 0 18px; font-size: 13px; color: #777; }
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .field input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 15px;
+    background: var(--cream);
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .field input:focus { border-color: var(--gold); }
+  .btn-gold {
+    display: inline-block;
+    width: 100%;
+    padding: 13px 24px;
+    background: var(--gold);
+    color: var(--navy);
+    border: none;
+    border-radius: 10px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter .15s;
+  }
+  .btn-gold:hover { filter: brightness(1.05); }
+  .btn-gold:disabled { opacity: .45; cursor: not-allowed; }
+  .gate-error {
+    color: #b3261e;
+    font-size: 13px;
+    margin: 10px 0 0;
+    min-height: 18px;
+  }
+
+  /* ---------- Progress strip ---------- */
+  .progress-wrap { margin-bottom: 14px; }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: var(--navy);
+    font-weight: 500;
+  }
+  #pctText { color: var(--gold-deep); font-weight: 700; }
+  .strip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .strip .node {
+    width: 30px; height: 30px;
+    flex: none;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    border: 2px solid var(--line);
+    background: #fff;
+    color: #b9b0a0;
+    transition: all .25s;
+  }
+  .strip .link {
+    flex: 1; height: 3px;
+    background: var(--line);
+    border-radius: 2px;
+    min-width: 6px;
+    transition: background .25s;
+  }
+  .strip .node.done {
+    background: var(--gold);
+    border-color: var(--gold-deep);
+    color: var(--navy);
+  }
+  .strip .link.done { background: var(--gold); }
+  .strip .node.current {
+    border-color: var(--navy-brand);
+    color: var(--navy-brand);
+    box-shadow: 0 0 0 4px rgba(29,83,148,0.15);
+    animation: pulse 1.6s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 3px rgba(29,83,148,0.12); }
+    50%     { box-shadow: 0 0 0 7px rgba(29,83,148,0.05); }
+  }
+
+  /* ---------- Player ---------- */
+  .player-wrap {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: #000;
+    aspect-ratio: 16 / 9;
+    box-shadow: 0 4px 18px rgba(12,45,84,0.12);
+  }
+  .player-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .player-dim {
+    position: absolute;
+    inset: 0;
+    background: rgba(8,32,61,0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold-soft);
+    font-size: 15px;
+    font-weight: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s;
+  }
+  .player-wrap.dimmed .player-dim { opacity: 1; pointer-events: auto; }
+
+  /* ---------- Question panel ---------- */
+  .qpanel {
+    margin-top: 18px;
+    border-top-color: var(--navy-brand);
+    animation: slideUp .35s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(14px); opacity: 0; }
+    to   { transform: translateY(0);   opacity: 1; }
+  }
+  .qpanel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .qpanel-head .cp-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .qpanel-head .q-count {
+    font-size: 12.5px;
+    color: #888;
+    background: var(--gold-tint);
+    border: 1px solid var(--line);
+    padding: 3px 10px;
+    border-radius: 14px;
+  }
+  #qText {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--navy);
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+  .opt {
+    display: block;
+    width: 100%;
+    text-align: start;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    background: var(--gold-tint);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--navy);
+    cursor: pointer;
+    transition: border-color .12s, background .12s;
+  }
+  .opt:hover { border-color: var(--gold); }
+  .opt.selected {
+    background: var(--gold);
+    border-color: var(--gold-deep);
+    font-weight: 700;
+  }
+  .qpanel .btn-gold { width: auto; min-width: 140px; margin-top: 6px; }
+
+  /* ---------- Toast ---------- */
+  #toast {
+    position: fixed;
+    bottom: 26px;
+    right: 50%;
+    transform: translateX(50%) translateY(20px);
+    background: var(--navy);
+    color: var(--gold-soft);
+    padding: 12px 26px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid var(--gold);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s, transform .3s;
+    z-index: 90;
+  }
+  #toast.show { opacity: 1; transform: translateX(50%) translateY(0); }
+
+  /* ---------- Completion ---------- */
+  #completePanel { text-align: center; margin-top: 18px; }
+  #completePanel img { width: 84px; height: 84px; margin-bottom: 12px; }
+  #completePanel h2 { color: var(--navy); font-size: 20px; margin: 0 0 6px; }
+  #completePanel .badge {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--navy);
+    font-weight: 700;
+    padding: 6px 20px;
+    border-radius: 20px;
+    margin: 10px 0;
+    font-size: 15px;
+  }
+  #completePanel p { color: #555; font-size: 15px; line-height: 1.8; margin: 8px 0 0; }
+
+  /* ---------- Footnote ---------- */
+  .footnote {
+    margin-top: 26px;
+    font-size: 12px;
+    color: #999;
+    text-align: center;
+    line-height: 1.8;
+  }
+  footer {
+    background: var(--navy);
+    border-top: 3px solid var(--gold);
+    color: rgba(255,255,255,0.65);
+    text-align: center;
+    font-size: 12px;
+    padding: 18px 16px;
+    margin-top: 30px;
+  }
+  footer b { color: var(--gold-soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    .strip .node { width: 24px; height: 24px; font-size: 10.5px; }
+    .page-title h1 { font-size: 18px; }
+    .section-tag { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= Header (styling mirrors reference nav) ================= -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <img class="emblem" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAMAAAD6TlWYAAAB/lBMVEUtk6FVa1tpjWAeXnlgqJ7YqCYAGrKgkjaVpGYDo+SIp4r//3ZDfZoLf7///wDsxSDx/6z4/+AAf395cjuhvtetzcyfwNjErUQAO4c8gHuq/6ohZYbNfBVOp8ageUG/v3+/v78Afcjew0nA3NQAAAAAV5j8/f4ATY4EdZcQhq39xQH1ugJOibcmk7kIfaIveK/ppwHUhwIsmsQzhbD9/9qqqqralAPE1+fNewT///+41tG90+TimgCDrc0Fl8iQtdIJZpUYZ6J5psjX5O43pNALkrqoxdsAP39VlLbj7PNomsEAVaojbaVOeXFTlpHTti0uhZOueypweVYreom0zeCPqG6uqU+NekqKh0twmHGyiCsAAP8NjcPYpQ8Ho9K1lTK01sltpoxsh2lJiYnKqC8zdniUeTaPmFVThXZPo6+xtFC5exdEqtJilrvjiQDElihpmouUpVYAVf9lemh2pXS5pza5gxjLtkcAAH8yZ3WKlWgwqeTathuomUipqWistGgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACTdYBsAAAAgHRSTlP///////8D/////wL/BAH/BjME//+j/////wP/////BAT//4sA/v/+//////////7/////OAP///8Bkf///////////////wT///8D////////////////////Af////+k//////////////////////8D//////8C/////////4fz0e8AAC4ISURBVHja7Z2JY9pIsv8Vxx5n8subnb3P936XhZARCMyssRcbJGRYIFwG42t8jO8jcWK/2MlMMkn+9dfV3RI6WkgIPBbZ7czExFziw7e6qquru7mZELfFr2Z++P3MV4thvkYuzPyez/xDlv8x83zx3wAD8xOEkBMML8DFfwI/ngeC/1z8N8Bg+uN5QjC8GuRCrj+dYGg1yIWfX7gJhhPg4n+b+YXairnw6y/cGgwjwJ7/GAMNcuOgvzBrkBsL/YVYg9x46C+8GuTC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" alt="شعار مدارس الرواد العالمية">
+    <div class="school-name">
+      <strong>مدارس الرواد العالمية</strong>
+      <span>Al-Rowad International Schools — Riyadh</span>
+    </div>
+  </div>
+</header>
+
+<section class="page-title">
+  <h1>برنامج التطوير المهني · مشاهدة تفاعلية</h1>
+  <p class="lecture">محاضرة: <b>تعليم اللغة العربية الفصحى بالفطرة والممارسة</b> — أ.د. عبدالله الدنان</p>
+</section>
+
+<main>
+
+  <!-- ================= 1) Identity gate ================= -->
+  <section id="gateCard" class="card">
+    <h2>تسجيل الدخول للجلسة</h2>
+    <p class="hint">فضلاً أدخل بياناتك قبل بدء المشاهدة. تُسجَّل إجاباتك تلقائياً باسمك.</p>
+    <div class="field">
+      <label for="eNumber">الرقم الوظيفي (E-Number)</label>
+      <input id="eNumber" type="text" inputmode="text" autocomplete="off" placeholder="مثال: E1234">
+    </div>
+    <div class="field">
+      <label for="fullName">الاسم الكامل</label>
+      <input id="fullName" type="text" autocomplete="off" placeholder="الاسم الثلاثي">
+    </div>
+    <button class="btn-gold" id="gateBtn">ابدأ المشاهدة</button>
+    <p class="gate-error" id="gateError"></p>
+  </section>
+
+  <!-- ================= 2) Main experience (hidden until identity passes) ================= -->
+  <section id="app" class="hidden">
+
+    <!-- Progress strip -->
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span id="cpProgressText">نقاط التحقق: ٠ / ١١</span>
+        <span>نسبة المشاهدة: <span id="pctText">٠٪</span></span>
+      </div>
+      <div class="strip" id="strip"></div>
+    </div>
+
+    <!-- Player -->
+    <div class="player-wrap" id="playerWrap">
+      <div id="ytPlayer"></div>
+      <div class="player-dim">⏸ توقف مؤقت — أجب عن أسئلة نقطة التحقق أدناه لمتابعة المشاهدة</div>
+    </div>
+
+    <!-- Question panel -->
+    <section id="questionPanel" class="card qpanel hidden">
+      <div class="qpanel-head">
+        <span class="cp-name" id="cpName"></span>
+        <span class="q-count" id="qCount"></span>
+      </div>
+      <div id="qText"></div>
+      <div id="qOptions"></div>
+      <button class="btn-gold" id="qNextBtn" disabled>التالي</button>
+    </section>
+
+    <!-- Completion panel -->
+    <section id="completePanel" class="card hidden">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAMAAAD6TlWYAAAB/lBMVEUtk6FVa1tpjWAeXnlgqJ7YqCYAGrKgkjaVpGYDo+SIp4r//3ZDfZoLf7///wDsxSDx/6z4/+AAf395cjuhvtetzcyfwNjErUQAO4c8gHuq/6ohZYbNfBVOp8ageUG/v3+/v78Afcjew0nA3NQAAAAAV5j8/f4ATY4EdZcQhq39xQH1ugJOibcmk7kIfaIveK/ppwHUhwIsmsQzhbD9/9qqqqralAPE1+fNewT///+41tG90+TimgCDrc0Fl8iQtdIJZpUYZ6J5psjX5O43pNALkrqoxdsAP39VlLbj7PNomsEAVaojbaVOeXFTlpHTti0uhZOueypweVYreom0zeCPqG6uqU+NekqKh0twmHGyiCsAAP8NjcPYpQ8Ho9K1lTK01sltpoxsh2lJiYnKqC8zdniUeTaPmFVThXZPo6+xtFC5exdEqtJilrvjiQDElihpmouUpVYAVf9lemh2pXS5pza5gxjLtkcAAH8yZ3WKlWgwqeTathuomUipqWistGgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACTdYBsAAAAgHRSTlP///////8D/////wL/BAH/BjME//+j/////wP/////BAT//4sA/v/+//////////7/////OAP///8Bkf///////////////wT///8D////////////////////Af////+k//////////////////////8D//////8C/////////4fz0e8AAC4ISURBVHja7Z2JY9pIsv8Vxx5n8subnb3P936XhZARCMyssRcbJGRYIFwG42t8jO8jcWK/2MlMMkn+9dfV3RI6WkgIPBbZ7czExFziw7e6qquru7mZELfFr2Z++P3MV4thvkYuzPyez/xDlv8x83zx3wAD8xOEkBMML8DFfwI/ngeC/1z8N8Bg+uN5QjC8GuRCrj+dYGg1yIWfX7gJhhPg4n+b+YXairnw6y/cGgwjwJ7/GAMNcuOgvzBrkBsL/YVYg9x46C+8GuTC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" alt="شعار مدارس الرواد العالمية">
+      <h2>أحسنت! اكتملت الجلسة التدريبية</h2>
+      <div class="badge" id="completeBadge"></div>
+      <p id="completeName"></p>
+      <p>شكراً لالتزامك بالتطوير المهني المستمر. تم تسجيل جميع إجاباتك بنجاح.</p>
+    </section>
+
+    <p class="footnote">
+      ملاحظة: التقدّم في هذه الصفحة يُحفظ مؤقتاً في المتصفح أثناء الجلسة فقط؛
+      عند إعادة تحميل الصفحة أو إغلاقها تبدأ المشاهدة من جديد، فيُرجى إكمال الجلسة في جلسة واحدة.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  <b>مدارس الرواد العالمية</b><br>
+  وحدة التطوير المهني · الرياض
+</footer>
+
+<!-- Toast + hidden iframe target for silent Google Form submission -->
+<div id="toast"></div>
+<iframe name="gform_iframe" id="gform_iframe" style="display:none" title="hidden"></iframe>
+
+<script>
+/* =====================================================================
+   CONFIG — EDIT THIS SECTION ONLY
+   =====================================================================
+   HOW TO WIRE UP THE GOOGLE FORM:
+   1. Create one Google Form with:
+        - a Short-answer question for the E-number
+        - a Short-answer question for the full name
+        - a Short-answer question for the checkpoint label
+        - one Multiple-choice (or Short-answer) question PER video question
+          (11 checkpoints x 3 questions = 33 form questions).
+   2. Open the form's "Get pre-filled link", fill dummy values, copy the
+      generated URL and read the entry IDs (entry.123456789) for each field.
+   3. Replace 1FAIpQLSc0LBrKIo0jk3Cc37Yjfuze10Ve4UT1wc-x1hGN7gCv7gYWhA below with the long ID from the form URL
+      (https://docs.google.com/forms/d/e/<THIS_PART>/viewform).
+   4. Replace the identity entry IDs in IDENTITY_ENTRIES.
+   5. For each question object below, replace:
+        q         -> the real Arabic question text
+        options   -> the four real answer options
+        correct   -> index (0-3) of the correct option (kept for future use;
+                     no right/wrong feedback is shown to the teacher)
+        formEntry -> that question's own entry ID from step 2.
+   Times are in seconds from the start of the video. You may add/remove
+   questions per checkpoint freely; the UI adapts automatically.
+   ===================================================================== */
+
+var FORM_ID = "1FAIpQLSc0LBrKIo0jk3Cc37Yjfuze10Ve4UT1wc-x1hGN7gCv7gYWhA"; // <-- replace with the real Google Form ID
+
+var IDENTITY_ENTRIES = {
+  eNumber:    "entry.1137018416", // <-- replace: form field for الرقم الوظيفي
+  fullName:   "entry.916715094", // <-- replace: form field for الاسم الكامل
+  checkpoint: "entry.211919044"  // <-- replace: form field for checkpoint label
+};
+
+var VIDEO_ID = "Qglv6aVhjUA";
+var VIDEO_DURATION = 6556; // seconds
+
+var CHECKPOINTS = [
+  { // ---- Checkpoint 1 — at 10:00 (600s) ----
+    time: 600,
+    questions: [
+      {
+        q: "بماذا شبّه المحاضر اللغةَ العربية الفصحى في جمعها للعرب من مختلف الأقطار؟",
+        options: ["بالنهر الذي يسقي مختلف البلدان", "بالجذر الذي تتفرع عنه الأغصان", "بالبيت الذي يجتمع فيه الإخوة", "بالخيط الذي يجمع حبات المسبحة"],
+        correct: 3,
+        formEntry: "entry.1473755647" // auto-replaced after form creation
+      },
+      {
+        q: "ذكر المحاضر بلدًا عربيًا تُدرَّس في جامعاته العلومُ كلُّها بالعربية بما فيها الطب والهندسة، فأي بلد هو؟",
+        options: ["مصر", "سوريا", "المغرب", "الكويت"],
+        correct: 1,
+        formEntry: "entry.1709056400" // auto-replaced after form creation
+      },
+      {
+        q: "كيف وصف المحاضر إتقانَ العربية قراءةً وكتابةً واستماعًا وتحدثًا؟",
+        options: ["بأنه واجب ديني على كل مسلم", "بأنه شرط أساسي لدخول الجامعة", "بأنه ضرورة حضارية لكل عربي", "بأنه هدف تربوي بعيد المنال"],
+        correct: 2,
+        formEntry: "entry.1418172436" // auto-replaced after form creation
+      }
+    ]
+  },
+  { // ---- Checkpoint 2 — at 20:00 (1200s) ----
+    time: 1200,
+    questions: [
+      {
+        q: "ما المشكلة التي نصّت عليها الدعوة التي قرأها المحاضر (ندوة وزارة التعليم السعودية 1985)؟",
+        options: ["قلة عدد معلمي اللغة العربية المؤهلين تربويًا", "ضعف مناهج التعبير والقراءة الحرة", "تدني مستوى تعليم العربية قبل الجامعة", "إهمال التراث الأدبي في المقررات"],
+        correct: 2,
+        formEntry: "entry.478150559" // auto-replaced after form creation
+      },
+      {
+        q: "ما الحل «الانطباعي» الذي وصفه المحاضر بأنه لا يقوم على دراسة علمية؟",
+        options: ["زيادة حصص اللغة العربية في المنهج", "تكثيف دورات تدريب المعلمين صيفًا", "تأليف كتب مبسطة لقواعد النحو", "إدخال الوسائط التقنية في التدريس"],
+        correct: 0,
+        formEntry: "entry.918063782" // auto-replaced after form creation
+      },
+      {
+        q: "عندما يقول الطفل الإنجليزي \"I goed\" بدل \"I went\"، فعلامَ يدل ذلك بحسب النظرية الحديثة؟",
+        options: ["على تقليده كلامَ والديه وترديده كما سمعه حرفيًا", "على اكتشافه القاعدةَ العامة وتطبيقها قياسًا", "على ضعف سمعه وتأخر نموّه اللغوي عن أقرانه", "على خلطه بين لغتين يسمعهما في البيت"],
+        correct: 1,
+        formEntry: "entry.54640870" // auto-replaced after form creation
+      }
+    ]
+  },
+  { // ---- Checkpoint 3 — at 30:00 (1800s) ----
+    time: 1800,
+    questions: [
+      {
+        q: "إلى أي عمر تبقى القدرة الفطرية لاكتساب اللغات في كامل نشاطها قبل أن تبدأ بالتراجع؟",
+        options: ["الثالثة", "السادسة", "الثامنة", "العاشرة"],
+        correct: 1,
+        formEntry: "entry.1580178521" // auto-replaced after form creation
+      },
+      {
+        q: "ما الدليل الذي ساقه العالم إريك لينيبرغ (من أبحاث الأطفال الصمّ) على أن للقدرة الفطرية عمرًا محددًا؟",
+        options: ["من استُعيد سمعُه في الثالثة ظل عاجزًا عن الكلام سنوات", "من وُلد أصمَّ يكتسب لغة الإشارة بسرعة تفوق أقرانه السامعين", "من فقَد سمعَه بعد العاشرة نسي لغته الأولى بالتدريج", "من استُعيد سمعُه في الرابعة عشرة لم يكتسب النطق أبدًا"],
+        correct: 3,
+        formEntry: "entry.359271973" // auto-replaced after form creation
+      },
+      {
+        q: "ما اللغات الثلاث التي يريدها المحاضر للطفل العربي؟",
+        options: ["العامية والفصحى ولغة أجنبية يختارها الأهل", "الفصحى ولغتان أجنبيتان تُختاران للعلوم والتقنية", "العامية والفصحى ولهجة عربية أخرى مجاورة", "الفصحى القرآنية والفصحى الحديثة والعامية"],
+        correct: 0,
+        formEntry: "entry.40390070" // auto-replaced after form creation
+      }
+    ]
+  },
+  { // ---- Checkpoint 4 — at 40:00 (2400s) ----
+    time: 2400,
+    questions: [
+      {
+        q: "بماذا فسّر المحاضر كون شعر الجاهلية وصدر الإسلام أكثر تأثيرًا في النفوس من شعر المتأخرين؟",
+        options: ["أصحابه عاشوا في بيئة صحراوية صافية", "موضوعاته أقرب إلى حياة الناس اليومية", "أصحابه قالوه بلغة اكتسبوها بالفطرة", "أوزانه وقوافيه أشد التزامًا بعمود الشعر"],
+        correct: 2,
+        formEntry: "entry.1763906178" // auto-replaced after form creation
+      },
+      {
+        q: "ماذا يحدث للطفل العربي حين يدخل المدرسة في السادسة بحسب وصف المحاضر؟",
+        options: ["يجد لغة الكتاب امتدادًا طبيعيًا للهجة أهله", "يتعلم الفصحى في أشهر معدودة لقرب لهجته منها", "يترك العامية نهائيًا ويستبدل بها الفصحى من أول يوم", "يفاجأ بلغة أخرى غير التي أتقنها في البيت"],
+        correct: 3,
+        formEntry: "entry.1109967701" // auto-replaced after form creation
+      },
+      {
+        q: "إلى أي درجة يتقن الطفل لهجة أهله العامية كما قال المحاضر؟",
+        options: ["ينسخها نسخًا حتى ليُعرَف من أي قرية هو", "يتقن مفرداتها ويخطئ في بعض تراكيبها", "يفهمها تمامًا لكنه ينتجها بتصرف شخصي", "يخلطها بما يسمعه في التلفاز من لهجات"],
+        correct: 0,
+        formEntry: "entry.388485791" // auto-replaced after form creation
+      }
+    ]
+  },
+  { // ---- Checkpoint 5 — at 50:00 (3000s) ----
+    time: 3000,
+    questions: [
+      {
+        q: "كم تصريفًا للفعل المضارع في الفصحى مقابل نحو ثلاثة تصاريف في العامية بحسب المحاضر؟",
+        options: ["١٢ تصريفًا", "١٤ تصريفًا", "١٦ تصريفًا", "١٨ تصريفًا"],
+        correct: 3,
+        formEntry: "entry.1120647404" // auto-replaced after form creation
+      },
+      {
+        q: "في مثال «استيقظت الفتاة وجلست قرب النافذة»، ما الذي يجعل الطفل يبدأ بكره الكتاب؟",
+        options: ["صعوبة رسم الحروف وقواعد الإملاء في كلماتها", "طول الجملة وكثرة مفرداتها الجديدة عليه", "حاجته إلى مَن يترجم له الجملة إلى العامية", "إلزامه بحفظ الجملة وإعرابها إعرابًا كاملًا"],
+        correct: 2,
+        formEntry: "entry.1647190597" // auto-replaced after form creation
+      },
+      {
+        q: "بأي لغة قال المحاضر إن المعلمين في المدارس العربية كلها يخاطبون طلابهم؟",
+        options: ["بالفصحى داخل الحصص الدراسية وبالعامية خارجها", "بالعامية دائمًا إلا عند القراءة من الكتاب", "بمزيج متوازن من الفصحى والعامية معًا", "بالفصحى المبسطة الخالية من الإعراب"],
+        correct: 1,
+        formEntry: "entry.1417585594" // auto-replaced after form creation
+      }
+    ]
+  },
+  { // ---- Checkpoint 6 — at 60:00 (3600s) ----
+    time: 3600,
+    questions: [
+      {
+        q: "ما الإحصاءة التي نسبها المحاضر إلى اليونسكو عن القراءة في العالم العربي؟",
+        options: ["كل ثمانين عربيًا يقرؤون كتابًا واحدًا في السنة", "كل عربي يقرأ في المتوسط كتابًا واحدًا سنويًا", "كل عشرة عرب يقرؤون كتابًا واحدًا في السنة", "كل أسرة عربية تقتني كتابًا واحدًا جديدًا في السنة"],
+        correct: 0,
+        formEntry: "entry.1548307648" // auto-replaced after form creation
+      },
+      {
+        q: "ماذا جاء في تقرير البنك الدولي (2008) عن المناهج العربية؟",
+        options: ["تركز على الكم المعرفي وتهمل المهارات اللغوية", "تعلّم الحفظ غيبًا ولا تعلّم حل المشكلات", "تفتقر إلى معلمين مدربين وتقنيات حديثة", "تكثر فيها الحصص وتقل فيها الأنشطة العملية"],
+        correct: 1,
+        formEntry: "entry.619452371" // auto-replaced after form creation
+      },
+      {
+        q: "ما «الوهمان» الراسخان في أذهان المربين كما وصفهما المحاضر؟",
+        options: ["أن الفصحى أصعب اللغات نطقًا وقواعدَ وأن العامية أنسب لتعليم الصغار", "أن النحو مملّ بطبيعته مهما بُسِّط وأن الطلاب لا يحبون القراءة مهما فعلنا", "أن الفصحى لا تُتقن إلا بحفظ النحو وأن المجتمع يهدم ما تبنيه المدرسة", "أن المعلمين عاجزون عن الفصحى جيلًا بعد جيل وأن تغيير المناهج فوق طاقتنا"],
+        correct: 2,
+        formEntry: "entry.787383910" // auto-replaced after form creation
+      }
+    ]
+  },
+  { // ---- Checkpoint 7 — at 70:00 (4200s) ----
+    time: 4200,
+    questions: [
+      {
+        q: "كيف بدأ المحاضر تجربته عام 1977 مع ابنه باسل؟",
+        options: ["كلّمه هو بالفصحى وكلّمته أمُّه بالعامية", "كلّمه الوالدان كلاهما بالفصحى وحدها منذ ولادته", "خصص له ساعةً يومية للحديث بالفصحى", "علّمه القراءة بالفصحى قبل سن الرابعة"],
+        correct: 0,
+        formEntry: "entry.289258934" // auto-replaced after form creation
+      },
+      {
+        q: "ماذا كان مستوى باسل في الثالثة من عمره بحسب المحاضر؟",
+        options: ["يفهم الفصحى جيدًا لكنه يجيب بالعامية", "يتحدث الفصحى ويخطئ أحيانًا في الإعراب", "يتحدث الفصحى رافعًا ناصبًا جارًّا دون خطأ", "يخلط الفصحى بالعامية في الجملة الواحدة أحيانًا"],
+        correct: 2,
+        formEntry: "entry.857386184" // auto-replaced after form creation
+      },
+      {
+        q: "ما الغاية التي ذكرها المحاضر من تأسيس دار الحضانة والروضة الناطقتين بالفصحى؟",
+        options: ["تخريج معلمين متقنين للفصحى منذ الصغر", "إثبات تفوق الفصحى على العامية في التعليم", "جمع مادة علمية لرسائل الماجستير والدكتوراه", "تقديم نموذج مؤسسي عملي يمكن للناس تقليده"],
+        correct: 3,
+        formEntry: "entry.517588874" // auto-replaced after form creation
+      }
+    ]
+  },
+  { // ---- Checkpoint 8 — at 80:00 (4800s) ----
+    time: 4800,
+    questions: [
+      {
+        q: "ما الصعوبة غير المتوقعة التي واجهها المحاضر عند افتتاح دور الحضانة؟",
+        options: ["رفض الأهالي فكرةَ مخاطبة أطفالهم الصغار بالفصحى", "أن المعلمات أنفسهن لا يتقنّ التحدث بالفصحى", "قلة الكتب والقصص المشكولة الموجهة للأطفال", "صعوبة الحصول على ترخيص رسمي للروضة"],
+        correct: 1,
+        formEntry: "entry.1785741306" // auto-replaced after form creation
+      },
+      {
+        q: "علامَ يقوم برنامجه لتدريب المعلمين والمعلمات على الفصحى؟",
+        options: ["على حفظ منظومات النحو ثم تطبيقها في الحديث شفهيًا", "على قراءة النصوص التراثية وتحليل تراكيبها", "على تلقين مفردات فصيحة بديلة عن العامية", "على الأداء والممارسة مع قواعد مبسطة عند الحاجة"],
+        correct: 3,
+        formEntry: "entry.1595546469" // auto-replaced after form creation
+      },
+      {
+        q: "ماذا أثبتت رسالة الماجستير التي أعدّتها الباحثة الأمريكية عن أطفال روضته؟",
+        options: ["تفوقهم في القراءة والتعبير بفارق يتراوح بين 9 و19 درجة", "تفوقهم في الرياضيات والعلوم بفارق يقارب 15 درجة كاملة", "تفوقهم في الحفظ والاستظهار على أقرانهم بمقدار الضعف تقريبًا", "تفوقهم في اللغة الإنجليزية بفارق واضح لانتقال أثر التعلم إليها"],
+        correct: 0,
+        formEntry: "entry.633694339" // auto-replaced after form creation
+      }
+    ]
+  },
+  { // ---- Checkpoint 9 — at 90:00 (5400s) ----
+    time: 5400,
+    questions: [
+      {
+        q: "في اختبار سلطنة عُمان، قرأ تلاميذ الصف الثاني (من المدارس الأربع المطبِّقة) قصةً غير مشكولة دون خطأ. كم كانت علامتهم مقابل أقرانهم في المدارس الأخرى؟",
+        options: ["19 مقابل 1", "15 مقابل 5", "18 مقابل 9", "20 مقابل 10"],
+        correct: 0,
+        formEntry: "entry.1100182278" // auto-replaced after form creation
+      },
+      {
+        q: "ماذا قررت وزارة التربية العُمانية بعد اطلاعها على نتائج التجربة؟",
+        options: ["إنشاء مركز وطني لتدريب معلمي الفصحى", "جعل التجربة اختيارية لمن يرغب من المدارس", "قصر التطبيق على الحلقة الأولى من التعليم", "تعميم التطبيق على مدارس السلطنة كلها"],
+        correct: 3,
+        formEntry: "entry.1898371820" // auto-replaced after form creation
+      },
+      {
+        q: "ما موقف المحاضر من قرار وزير التربية السعودي بإلزام المعلمين بالفصحى؟",
+        options: ["رحّب به ترحيبًا كاملًا وعدّه كافيًا لحل المشكلة نهائيًا", "تحفّظ عليه لأنه في رأيه قرار سابق لأوانه بسنوات", "رحّب به مذكّرًا بأن البلاغات دون متابعة وتطبيق لا تثمر", "اقترح تأجيل تطبيقه إلى أن يُدرَّب المعلمون جميعًا"],
+        correct: 2,
+        formEntry: "entry.1115167902" // auto-replaced after form creation
+      }
+    ]
+  },
+  { // ---- Checkpoint 10 — at 100:00 (6000s) ----
+    time: 6000,
+    questions: [
+      {
+        q: "ماذا روى أحد الحاضرين (معلم) عن تجربته في التحدث بالفصحى مع الصفوف الأولى؟",
+        options: ["بعد فصل دراسي كامل بدأ طلابه يفهمونها دون أن ينطقوها", "بعد نحو شهر صار طلابه لا يتحدثون إلا بفصحى متقنة", "بعد أسبوع واحد حفظ طلابه قواعد الإعراب الأساسية", "بعد سنة كاملة ظل أكثر طلابه يخلطونها بلهجاتهم"],
+        correct: 1,
+        formEntry: "entry.2109159298" // auto-replaced after form creation
+      },
+      {
+        q: "ما القاعدة المبسطة التي يعلّمها المحاضر للمنادى بدل الإعراب المفصل؟",
+        options: ["المنادى مبنيّ على الضم دائمًا في محل نصب مفعول به لفعل محذوف", "المنادى منصوب في كل الأحوال إلا إذا كان علمًا مفردًا فيُرفَع", "كلمة واحدة تُضَم، وكلمتان مترابطتان تُنصَب أولاهما وتُجَر ثانيتهما", "يُنادى الاسم مرفوعًا إن كان معرفةً ومنصوبًا إن كان نكرةً مقصودة"],
+        correct: 2,
+        formEntry: "entry.2017566691" // auto-replaced after form creation
+      },
+      {
+        q: "بماذا فسّر المحاضر قدرة العرب قديمًا على القراءة دون تنقيط؟",
+        options: ["قلة ما كان يُكتب وشيوع الحفظ الشفهي عندهم", "إتقانهم التام للغة يجعلهم يتوقعون الكلمات", "وجود قرائن في الخط تدل على الحروف المهملة", "اعتمادهم على السياق الديني للنصوص المكتوبة"],
+        correct: 1,
+        formEntry: "entry.1756741326" // auto-replaced after form creation
+      }
+    ]
+  },
+  { // ---- Checkpoint 11 — at 109:16 (6556s) ----
+    time: 6556,
+    questions: [
+      {
+        q: "ما رأي المحاضر في الرسوم المتحركة الناطقة بالفصحى؟",
+        options: ["مفيدة لتعليم المفردات الجديدة لكنها لا تبني تراكيب صحيحة", "قليلة الأثر لأن الطفل يشاهدها مشاهدة سلبية دون تفاعل حقيقي", "مؤثرة سلبًا إذا خالطت لغتَها لهجاتُ الممثلين العامية في الأداء", "مفيدة جدًا بشرط تحديد مدة المشاهدة ومناقشة الطفل في محتواها"],
+        correct: 3,
+        formEntry: "entry.754903342" // auto-replaced after form creation
+      },
+      {
+        q: "ماذا ذكر المحاضر عن ابنه باسل في الصف الثاني الابتدائي؟",
+        options: ["قرأ نحو ثلاثمئة وستين كتابًا في تلك السنة", "حفظ ثلاثمئة وستين قصيدة من الشعر الفصيح", "كتب ثلاثمئة وستين صفحة من التعبير الحر", "استعار ستةً وثلاثين كتابًا من مكتبة مدرسته"],
+        correct: 0,
+        formEntry: "entry.1992502411" // auto-replaced after form creation
+      },
+      {
+        q: "كيف يكتسب من تجاوز العاشرة الفصحى بحسب المحاضر؟",
+        options: ["بحفظ المتون النحوية وتسميع قواعدها أسبوعًا بعد أسبوع", "بالإقامة مدةً كافية في بيئة لا تتكلم إلا الفصحى", "بالممارسة المستمرة كقراءة القصص وروايتها بالفصحى", "بدراسة علم اللغة النفسي وتطبيق نظرياته الحديثة"],
+        correct: 2,
+        formEntry: "entry.728258009" // auto-replaced after form creation
+      }
+    ]
+  }
+];
+
+/* =====================================================================
+   END OF CONFIG — no edits needed below this line
+   ===================================================================== */
+
+// ---------------------------------------------------------------------
+// State (in-memory only, by design — reloading the page restarts progress)
+// ---------------------------------------------------------------------
+var teacher = { eNumber: "", fullName: "" };
+var player = null;
+var apiReady = false;
+var playerRequested = false;
+var pollTimer = null;
+var maxWatched = 0;                                   // furthest second reached
+var answered = CHECKPOINTS.map(function () { return false; });
+var activeCheckpoint = -1;                            // checkpoint currently on screen
+var activeQuestion = 0;                               // index within the checkpoint
+var pendingAnswers = [];                              // answers of the open checkpoint
+var selectedOption = -1;
+
+// ---------------------------------------------------------------------
+// Small helpers
+// ---------------------------------------------------------------------
+var AR_DIGITS = "٠١٢٣٤٥٦٧٨٩";
+function arNum(n) {
+  return String(n).replace(/\d/g, function (d) { return AR_DIGITS[+d]; });
+}
+function fmtTime(sec) {
+  var m = Math.floor(sec / 60), s = Math.round(sec % 60);
+  return (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+}
+function el(id) { return document.getElementById(id); }
+function showToast(msg, ms) {
+  var t = el("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._h);
+  t._h = setTimeout(function () { t.classList.remove("show"); }, ms || 2200);
+}
+
+// ---------------------------------------------------------------------
+// Identity gate
+// ---------------------------------------------------------------------
+el("gateBtn").addEventListener("click", function () {
+  var e = el("eNumber").value.trim();
+  var n = el("fullName").value.trim();
+  if (!e || !n) {
+    el("gateError").textContent = "الرجاء إدخال الرقم الوظيفي والاسم الكامل.";
+    return;
+  }
+  teacher.eNumber = e;
+  teacher.fullName = n;
+  el("gateError").textContent = "";
+  el("gateCard").classList.add("hidden");
+  el("app").classList.remove("hidden");
+  buildStrip();
+  updateProgressUI();
+  requestPlayer();
+});
+
+// ---------------------------------------------------------------------
+// YouTube IFrame API
+// ---------------------------------------------------------------------
+(function loadYTApi() {
+  var tag = document.createElement("script");
+  tag.src = "https://www.youtube.com/iframe_api";
+  document.head.appendChild(tag);
+})();
+
+function onYouTubeIframeAPIReady() {
+  apiReady = true;
+  if (playerRequested) createPlayer();
+}
+
+function requestPlayer() {
+  playerRequested = true;
+  if (apiReady) createPlayer();
+}
+
+function createPlayer() {
+  if (player) return;
+  player = new YT.Player("ytPlayer", {
+    videoId: VIDEO_ID,
+    playerVars: { rel: 0, modestbranding: 1, playsinline: 1 },
+    events: {
+      onReady: function () { startPolling(); },
+      onStateChange: onPlayerStateChange
+    }
+  });
+}
+
+function onPlayerStateChange(ev) {
+  // When the video truly ends, credit full watch time and fire the
+  // final checkpoint if it hasn't been shown yet.
+  if (ev.data === YT.PlayerState.ENDED) {
+    maxWatched = VIDEO_DURATION;
+    var next = firstUnanswered();
+    if (next !== -1 && activeCheckpoint === -1) openCheckpoint(next);
+    updateProgressUI();
+  }
+}
+
+function firstUnanswered() {
+  for (var i = 0; i < answered.length; i++) if (!answered[i]) return i;
+  return -1;
+}
+
+// ---------------------------------------------------------------------
+// Poll loop: seek guard + checkpoint trigger (every 500 ms)
+// ---------------------------------------------------------------------
+function startPolling() {
+  if (pollTimer) return;
+  pollTimer = setInterval(tick, 500);
+}
+
+function tick() {
+  if (!player || typeof player.getCurrentTime !== "function") return;
+  var t = player.getCurrentTime() || 0;
+  var state = player.getPlayerState();
+
+  // While a checkpoint is open the video must stay paused at that point.
+  if (activeCheckpoint >= 0) {
+    if (state === YT.PlayerState.PLAYING) player.pauseVideo();
+    return;
+  }
+
+  if (state === YT.PlayerState.PLAYING) {
+    // Seek guard: no skipping ahead (rewinding is always allowed).
+    if (t > maxWatched + 2) {
+      player.seekTo(maxWatched, true);
+      showToast("لا يمكن تقديم الفيديو إلى أجزاء لم تُشاهد بعد");
+    } else if (t > maxWatched) {
+      maxWatched = t;
+    }
+    // Checkpoint trigger: earliest unanswered checkpoint whose time passed.
+    var next = firstUnanswered();
+    if (next !== -1 && t >= CHECKPOINTS[next].time - 0.4) {
+      openCheckpoint(next);
+    }
+  }
+  updateProgressUI();
+}
+
+// ---------------------------------------------------------------------
+// Checkpoint question flow
+// ---------------------------------------------------------------------
+function openCheckpoint(i) {
+  activeCheckpoint = i;
+  activeQuestion = 0;
+  pendingAnswers = [];
+  selectedOption = -1;
+  player.pauseVideo();
+  el("playerWrap").classList.add("dimmed");
+  el("questionPanel").classList.remove("hidden");
+  renderQuestion();
+  updateProgressUI();
+  el("questionPanel").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function renderQuestion() {
+  var cp = CHECKPOINTS[activeCheckpoint];
+  var q = cp.questions[activeQuestion];
+  el("cpName").textContent =
+    "نقطة التحقق " + arNum(activeCheckpoint + 1) + " — عند الدقيقة " + fmtTime(cp.time);
+  el("qCount").textContent =
+    "السؤال " + arNum(activeQuestion + 1) + " من " + arNum(cp.questions.length);
+  el("qText").textContent = q.q;
+
+  var box = el("qOptions");
+  box.innerHTML = "";
+  q.options.forEach(function (opt, idx) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "opt";
+    b.textContent = opt;
+    b.addEventListener("click", function () {
+      selectedOption = idx;
+      Array.prototype.forEach.call(box.children, function (c, j) {
+        c.classList.toggle("selected", j === idx);
+      });
+      el("qNextBtn").disabled = false;
+    });
+    box.appendChild(b);
+  });
+
+  selectedOption = -1;
+  var nextBtn = el("qNextBtn");
+  nextBtn.disabled = true;
+  nextBtn.textContent =
+    activeQuestion === cp.questions.length - 1 ? "حفظ الإجابات" : "التالي";
+}
+
+el("qNextBtn").addEventListener("click", function () {
+  if (selectedOption < 0 || activeCheckpoint < 0) return;
+  var cp = CHECKPOINTS[activeCheckpoint];
+  var q = cp.questions[activeQuestion];
+  pendingAnswers.push({ formEntry: q.formEntry, value: q.options[selectedOption] });
+
+  if (activeQuestion < cp.questions.length - 1) {
+    activeQuestion++;
+    renderQuestion();
+  } else {
+    finishCheckpoint();
+  }
+});
+
+function finishCheckpoint() {
+  var i = activeCheckpoint;
+  submitAnswers(i, pendingAnswers);
+  answered[i] = true;
+  activeCheckpoint = -1;
+  el("questionPanel").classList.add("hidden");
+  el("playerWrap").classList.remove("dimmed");
+  showToast("تم الحفظ ✓");
+  updateProgressUI();
+
+  if (firstUnanswered() === -1) {
+    showCompletion();
+  } else {
+    // Auto-resume playback shortly after the confirmation.
+    setTimeout(function () {
+      if (player && activeCheckpoint === -1) player.playVideo();
+    }, 900);
+  }
+}
+
+// ---------------------------------------------------------------------
+// Silent Google Form submission (hidden form -> hidden iframe, no CORS)
+// ---------------------------------------------------------------------
+function submitAnswers(checkpointIndex, answers) {
+  var cp = CHECKPOINTS[checkpointIndex];
+  var form = document.createElement("form");
+  form.action = "https://docs.google.com/forms/d/e/" + FORM_ID + "/formResponse";
+  form.method = "POST";
+  form.target = "gform_iframe"; // response lands in the hidden iframe
+  form.style.display = "none";
+
+  function add(name, value) {
+    var input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  }
+
+  // Identity + checkpoint label ride along with every submission.
+  add(IDENTITY_ENTRIES.eNumber, teacher.eNumber);
+  add(IDENTITY_ENTRIES.fullName, teacher.fullName);
+  add(IDENTITY_ENTRIES.checkpoint,
+      "نقطة التحقق " + (checkpointIndex + 1) + " @ " + fmtTime(cp.time));
+  answers.forEach(function (a) { add(a.formEntry, a.value); });
+
+  document.body.appendChild(form);
+  form.submit();
+  setTimeout(function () { form.remove(); }, 4000);
+}
+
+// ---------------------------------------------------------------------
+// Progress strip + percent watched
+// ---------------------------------------------------------------------
+function buildStrip() {
+  var strip = el("strip");
+  strip.innerHTML = "";
+  CHECKPOINTS.forEach(function (cp, i) {
+    if (i > 0) {
+      var link = document.createElement("div");
+      link.className = "link";
+      strip.appendChild(link);
+    }
+    var node = document.createElement("div");
+    node.className = "node";
+    node.textContent = arNum(i + 1);
+    node.title = "نقطة التحقق " + arNum(i + 1) + " — " + fmtTime(cp.time);
+    strip.appendChild(node);
+  });
+}
+
+function updateProgressUI() {
+  var pct = Math.min(100, Math.round((maxWatched / VIDEO_DURATION) * 100));
+  el("pctText").textContent = arNum(pct) + "٪";
+
+  var done = answered.filter(Boolean).length;
+  el("cpProgressText").textContent =
+    "نقاط التحقق: " + arNum(done) + " / " + arNum(CHECKPOINTS.length);
+
+  var strip = el("strip");
+  var nodes = strip.querySelectorAll(".node");
+  var links = strip.querySelectorAll(".link");
+  var current = activeCheckpoint >= 0 ? activeCheckpoint : firstUnanswered();
+  nodes.forEach(function (n, i) {
+    n.classList.toggle("done", answered[i]);
+    n.classList.toggle("current", i === current && !answered[i]);
+  });
+  links.forEach(function (l, i) {
+    // link i sits before node i+1; light it when node i is answered
+    l.classList.toggle("done", answered[i]);
+  });
+}
+
+// ---------------------------------------------------------------------
+// Completion
+// ---------------------------------------------------------------------
+function showCompletion() {
+  el("completeBadge").textContent =
+    "نقاط التحقق المكتملة: " + arNum(CHECKPOINTS.length) + " / " + arNum(CHECKPOINTS.length);
+  el("completeName").textContent =
+    "الأستاذ/ة: " + teacher.fullName + " (" + teacher.eNumber + ")";
+  el("completePanel").classList.remove("hidden");
+  el("completePanel").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+</script>
+</body>
+</html>
