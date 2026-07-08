@@ -449,8 +449,8 @@
     </section>
 
     <p class="footnote">
-      ملاحظة: التقدّم في هذه الصفحة يُحفظ مؤقتاً في المتصفح أثناء الجلسة فقط؛
-      عند إعادة تحميل الصفحة أو إغلاقها تبدأ المشاهدة من جديد، فيُرجى إكمال الجلسة في جلسة واحدة.
+      ملاحظة: يُحفظ تقدمك تلقائيًا؛ يمكنك إغلاق الصفحة والعودة في وقت آخر،
+      وبإدخال رقمك الوظيفي نفسه تستأنف المشاهدة من حيث توقفت.
     </p>
     <p class="footnote">
       تواجه مشكلة في هذه الصفحة؟ يمكن بدلًا من ذلك
@@ -817,7 +817,7 @@ function fetchServerProgress(eNumber) {
     return Promise.resolve(null);
   }
   var ctl = ("AbortController" in window) ? new AbortController() : null;
-  var timer = ctl && setTimeout(function () { ctl.abort(); }, 3500);
+  var timer = ctl && setTimeout(function () { ctl.abort(); }, 12000);
   return fetch(PROGRESS_API + "?e=" + encodeURIComponent(eNumber),
                ctl ? { signal: ctl.signal } : {})
     .then(function (r) { return r.json(); })
