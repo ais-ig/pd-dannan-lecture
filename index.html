@@ -508,6 +508,12 @@ var IDENTITY_ENTRIES = {
 var VIDEO_ID = "Qglv6aVhjUA";
 var VIDEO_DURATION = 6556; // seconds
 
+// Progress lookup web app (Apps Script, Deploy > Web app > Anyone).
+// Returns {done:[1,4,...]} for a given E-number so viewing can resume
+// from any device. If left as the placeholder, the page still works
+// and falls back to same-device localStorage resume only.
+var PROGRESS_API = "https://script.google.com/macros/s/AKfycbwu2xl_feaDnIKef1DPmMFi3XcC_ucNHj17vIrenxn1y6IGTvFduZrlV0N4HQZuLKIJTg/exec";
+
 var CHECKPOINTS = [
   { // ---- Checkpoint 1 — at 10:00 (600s) ----
     time: 600,
@@ -782,6 +788,71 @@ var activeCheckpoint = -1;                            // checkpoint currently on
 var activeQuestion = 0;                               // index within the checkpoint
 var pendingAnswers = [];                              // answers of the open checkpoint
 var selectedOption = -1;
+var resumeTime = 0;                                   // where to seek once the player is ready
+var saveCounter = 0;                                  // throttle for position saves
+
+// ---------------------------------------------------------------------
+// Local progress storage (same-device resume; server lookup wins for
+// which checkpoints are done, local adds the exact playback position)
+// ---------------------------------------------------------------------
+var LS_KEY = "aisDannanPD_v1";
+function saveLocal() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      e: teacher.eNumber, n: teacher.fullName, t: Math.floor(maxWatched), done: answered
+    }));
+  } catch (err) { /* storage unavailable: silently skip */ }
+}
+function loadLocal() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || "null"); }
+  catch (err) { return null; }
+}
+function clearLocal() {
+  try { localStorage.removeItem(LS_KEY); } catch (err) {}
+}
+
+// Fetch completed checkpoints from the progress web app (3.5s budget).
+function fetchServerProgress(eNumber) {
+  if (!PROGRESS_API || PROGRESS_API.indexOf("PLACEHOLDER") !== -1) {
+    return Promise.resolve(null);
+  }
+  var ctl = ("AbortController" in window) ? new AbortController() : null;
+  var timer = ctl && setTimeout(function () { ctl.abort(); }, 3500);
+  return fetch(PROGRESS_API + "?e=" + encodeURIComponent(eNumber),
+               ctl ? { signal: ctl.signal } : {})
+    .then(function (r) { return r.json(); })
+    .then(function (j) { if (timer) clearTimeout(timer); return (j && j.ok) ? j : null; })
+    .catch(function () { if (timer) clearTimeout(timer); return null; });
+}
+
+// Merge server + local progress into the page state, before the player loads.
+function applyProgress(server, local) {
+  var sameUserLocal = local && local.e &&
+    local.e.toLowerCase() === teacher.eNumber.toLowerCase() ? local : null;
+
+  if (server && server.done) {
+    server.done.forEach(function (num) {           // 1-based checkpoint numbers
+      if (num >= 1 && num <= answered.length) answered[num - 1] = true;
+    });
+  }
+  if (sameUserLocal && sameUserLocal.done) {
+    sameUserLocal.done.forEach(function (d, i) { if (d) answered[i] = true; });
+  }
+
+  // Watched time: at least up to the last completed checkpoint,
+  // plus the exact local position if we have one for this teacher.
+  for (var i = 0; i < answered.length; i++) {
+    if (answered[i]) maxWatched = Math.max(maxWatched, CHECKPOINTS[i].time);
+  }
+  if (sameUserLocal) maxWatched = Math.max(maxWatched, sameUserLocal.t || 0);
+  resumeTime = Math.floor(maxWatched);
+
+  var doneCount = answered.filter(Boolean).length;
+  if (doneCount > 0 && doneCount < answered.length) {
+    showToast("أهلًا بعودتك! نستأنف من نقطة التحقق " + arNum(firstUnanswered() + 1), 3500);
+  }
+  return doneCount;
+}
 
 // ---------------------------------------------------------------------
 // Small helpers
@@ -816,11 +887,21 @@ el("gateBtn").addEventListener("click", function () {
   teacher.eNumber = e;
   teacher.fullName = n;
   el("gateError").textContent = "";
-  el("gateCard").classList.add("hidden");
-  el("app").classList.remove("hidden");
-  buildStrip();
-  updateProgressUI();
-  requestPlayer();
+  var btn = el("gateBtn");
+  btn.disabled = true;
+  btn.textContent = "جارٍ التحقق من تقدمك...";
+
+  fetchServerProgress(e).then(function (server) {
+    applyProgress(server, loadLocal());
+    el("gateCard").classList.add("hidden");
+    el("app").classList.remove("hidden");
+    buildStrip();
+    updateProgressUI();
+    if (firstUnanswered() === -1 && answered.length > 0) {
+      showCompletion(); // already finished everything on a previous visit
+    }
+    requestPlayer();
+  });
 });
 
 // ---------------------------------------------------------------------
@@ -848,7 +929,10 @@ function createPlayer() {
     videoId: VIDEO_ID,
     playerVars: { rel: 0, modestbranding: 1, playsinline: 1 },
     events: {
-      onReady: function () { startPolling(); },
+      onReady: function () {
+        if (resumeTime > 1) player.seekTo(resumeTime, true);
+        startPolling();
+      },
       onStateChange: onPlayerStateChange
     }
   });
@@ -896,6 +980,7 @@ function tick() {
       showToast("لا يمكن تقديم الفيديو إلى أجزاء لم تُشاهد بعد");
     } else if (t > maxWatched) {
       maxWatched = t;
+      if (++saveCounter % 10 === 0) saveLocal(); // persist position every ~5s
     }
     // Checkpoint trigger: earliest unanswered checkpoint whose time passed.
     var next = firstUnanswered();
@@ -973,6 +1058,7 @@ function finishCheckpoint() {
   var i = activeCheckpoint;
   submitAnswers(i, pendingAnswers);
   answered[i] = true;
+  saveLocal();
   activeCheckpoint = -1;
   el("questionPanel").classList.add("hidden");
   el("playerWrap").classList.remove("dimmed");
@@ -1072,6 +1158,7 @@ function showCompletion() {
     "الأستاذ/ة: " + teacher.fullName + " (" + teacher.eNumber + ")";
   el("completePanel").classList.remove("hidden");
   el("completePanel").scrollIntoView({ behavior: "smooth", block: "center" });
+  clearLocal(); // free the browser for the next teacher on a shared device
 }
 </script>
 </body>
